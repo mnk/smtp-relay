@@ -1,0 +1,11 @@
+---
+- name: Setup Ansible for talking with Linode
+  hosts: localhost
+  tasks:
+    - pip:
+        name: linode_api4
+
+- name: Setup SMTP relay
+  hosts: smtp-relay
+  roles:
+    - linode_host

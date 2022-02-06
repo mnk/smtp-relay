@@ -1,0 +1,45 @@
+---
+- tempfile:
+  register: key_file
+- shell: |
+    if ! grep '{{ lish_host }}' ~/.ssh/known_hosts; then
+      ssh-keyscan -t ed25519 {{ lish_host }} > {{ key_file.path }}
+      if ssh-keygen -lf {{ key_file.path }} | grep '{{ lish_host_fingerprint }}'; then
+        cat {{ key_file.path }} >> ~/.ssh/known_hosts
+      else
+        echo "Key file did not match fingerprint {{ lish_host_fingerprint }}"
+        exit 1
+      fi
+    fi
+  delegate_to: localhost
+
+- name: Create a new Linode.
+  linode_v4:
+    label: "{{ inventory_hostname }}"
+    access_token: "{{ linode_token }}"
+    type: g6-nanode-1
+    region: eu-central
+    image: linode/fedora35
+    authorized_keys: "{{ authorized_keys }}"
+    state: present
+  delegate_to: localhost
+  register: linode_host
+- debug:
+    msg: "linode_host"
+- set_fact:
+    ansible_host: "{{ linode_host.instance.ipv4[0] }}"
+    ansible_ssh_user: root
+
+- block:
+    - wait_for:
+        host: "{{ ansible_host }}"
+        port: 22
+    - shell: ssh-keyscan -t ed25519 {{ ansible_host }}
+      register: keyscan
+    # FIXME: Use lish shell to verify the host key of the newly installed VM - see lish host key setup above
+    - known_hosts:
+        name: "{{ ansible_host }}"
+        key: "{{ keyscan.stdout }}"
+  delegate_to: localhost
+
+- setup:
