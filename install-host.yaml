@@ -7,5 +7,7 @@
 
 - name: Setup SMTP relay
   hosts: smtp-relay
+  gather_facts: false
   roles:
     - linode_host
+    - postfix

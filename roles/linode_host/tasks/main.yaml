@@ -1,16 +1,17 @@
 ---
-- tempfile:
-  register: key_file
-- shell: |
-    if ! grep '{{ lish_host }}' ~/.ssh/known_hosts; then
-      ssh-keyscan -t ed25519 {{ lish_host }} > {{ key_file.path }}
-      if ssh-keygen -lf {{ key_file.path }} | grep '{{ lish_host_fingerprint }}'; then
-        cat {{ key_file.path }} >> ~/.ssh/known_hosts
-      else
-        echo "Key file did not match fingerprint {{ lish_host_fingerprint }}"
-        exit 1
-      fi
-    fi
+- block:
+    - tempfile:
+      register: key_file
+    - shell: |
+        if ! grep '{{ lish_host }}' ~/.ssh/known_hosts; then
+          ssh-keyscan -t ed25519 {{ lish_host }} > {{ key_file.path }}
+          if ssh-keygen -lf {{ key_file.path }} | grep '{{ lish_host_fingerprint }}'; then
+            cat {{ key_file.path }} >> ~/.ssh/known_hosts
+          else
+            echo "Key file did not match fingerprint {{ lish_host_fingerprint }}"
+            exit 1
+          fi
+        fi
   delegate_to: localhost
 
 - name: Create a new Linode.
@@ -44,6 +45,18 @@
 
 - setup:
 
+- sysctl:
+    name: net.ipv6.conf.all.disable_ipv6
+    value: '1'
+- sysctl:
+    name: net.ipv6.conf.default.disable_ipv6
+    value: '1'
+- sysctl:
+    name: net.ipv6.conf.lo.disable_ipv6
+    value: '1'
+- dnf:
+    name: "*"
+    state: latest
 - firewalld:
     source: "{{ trusted_networks }}"
     zone: internal
