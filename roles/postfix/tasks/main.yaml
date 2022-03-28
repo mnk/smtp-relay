@@ -2,3 +2,47 @@
 - package:
     name: postfix
     state: present
+- lineinfile:
+    path: /etc/postfix/main.cf
+    line: "{{ item }}"
+  with_items:
+    - "mydomain = mnk.dk"
+    - "myorigin = $mydomain"
+    - "virtual_alias_maps = hash:/etc/postfix/virtual"
+    - "sender_canonical_maps = tcp:localhost:10001"
+    - "sender_canonical_classes = envelope_sender"
+    - "recipient_canonical_maps = tcp:localhost:10002"
+    - "recipient_canonical_classes= envelope_recipient,header_recipient"
+# FIXME: add virtual and run "postmap /etc/postfix/virtual"
+
+
+# FIXME: Setup SPF record for domain
+
+- package:
+    name: postsrsd
+    state: present
+
+- replace:
+    path: /etc/postfix/main.cf
+    regexp: '^inet_interfaces.*$'
+    replace: 'inet_interfaces = all'
+# FIXME: Disable IPv6 - https://bugzilla.redhat.com/show_bug.cgi?id=1894137
+- replace:
+    path: /etc/postfix/main.cf
+    regexp: '^inet_protocols.*$'
+    replace: 'inet_protocols = ipv4'
+
+
+- service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  with_items:
+    - postfix
+    - postsrsd
+- firewalld:
+    zone: public
+    permanent: yes
+    immediate: yes
+    service: "smtp"
+    state: enabled
