@@ -41,8 +41,11 @@
     - postfix
     - postsrsd
 - firewalld:
-    zone: public
+    zone: "{{ item }}"
     permanent: yes
     immediate: yes
     service: "smtp"
     state: enabled
+  with_items:
+    - public
+    - internal
