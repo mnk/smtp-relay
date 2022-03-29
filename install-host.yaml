@@ -1,4 +1,12 @@
 ---
+- name: Install pip
+  hosts: localhost
+  become: true
+  tasks:
+    - package:
+        name: pip
+        state: present
+
 - name: Setup Ansible for talking with Linode
   hosts: localhost
   tasks:
