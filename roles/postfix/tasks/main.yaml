@@ -13,8 +13,22 @@
     - "sender_canonical_classes = envelope_sender"
     - "recipient_canonical_maps = tcp:localhost:10002"
     - "recipient_canonical_classes= envelope_recipient,header_recipient"
-# FIXME: add virtual and run "postmap /etc/postfix/virtual"
 
+- blockinfile:
+    path: /etc/postfix/virtual
+    block: |
+      {% for domain in virtual_mail_domains %}
+      {% for domain_name, aliases in domain.items() %}
+      {{ domain_name }} anything
+      {% for alias, target in aliases.items() %}
+      {{ alias }}{{ domain_name }} {{ target }}
+      {% endfor %}
+      {% endfor %}
+      {% endfor %}
+  register: virtual
+
+- command: postmap /etc/postfix/virtual
+  when: virtual.changed
 
 # FIXME: Setup SPF record for domain
 
