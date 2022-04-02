@@ -6,4 +6,4 @@ ordinary GMail accounts.
 
 To setup the relay run:
 
-        ansible-playbook -i ../inventory/hosts.yml install-host.yaml
+        ansible-playbook install-host.yaml

@@ -18,9 +18,9 @@
     path: /etc/postfix/virtual
     block: |
       {% for domain in virtual_mail_domains %}
-      {% for domain_name, aliases in domain.items() %}
+      {% for domain_name, domain_config in domain.items() %}
       {{ domain_name }} anything
-      {% for alias, target in aliases.items() %}
+      {% for alias, target in domain_config['aliases'].items() %}
       {{ alias }}{{ domain_name }} {{ target }}
       {% endfor %}
       {% endfor %}

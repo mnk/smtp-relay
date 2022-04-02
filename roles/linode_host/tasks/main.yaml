@@ -17,7 +17,7 @@
 - name: Create a new Linode.
   linode_v4:
     label: "{{ inventory_hostname }}"
-    access_token: "{{ linode_token }}"
+    access_token: "{{ lookup('ini', 'token section=' + linode_user + ' file=~/.config/linode-cli') }}"
     type: g6-nanode-1
     region: eu-central
     image: linode/fedora35

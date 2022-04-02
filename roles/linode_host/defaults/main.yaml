@@ -1,3 +1,4 @@
 ---
+linode_user: "{{ lookup('env', 'USER') }}"
 lish_host: lish-frankfurt.linode.com
 lish_host_fingerprint: SHA256:vG1rnoGe7XRRY0nauJREQk75OamxCwRRpeaTDB8LpgM
