@@ -4,15 +4,18 @@
     state: present
 - lineinfile:
     path: /etc/postfix/main.cf
-    line: "{{ item }}"
-  with_items:
-    - "mydomain = mnk.dk"
-    - "myorigin = $mydomain"
-    - "virtual_alias_maps = hash:/etc/postfix/virtual"
-    - "sender_canonical_maps = tcp:localhost:10001"
-    - "sender_canonical_classes = envelope_sender"
-    - "recipient_canonical_maps = tcp:localhost:10002"
-    - "recipient_canonical_classes= envelope_recipient,header_recipient"
+    regexp: '^{{ item.key }}'
+    line: "{{ item.key }} = {{ item.value }}"
+  with_dict:
+    mydomain: mnk.dk
+    myorigin: $mydomain
+    virtual_alias_maps: hash:/etc/postfix/virtual
+    sender_canonical_maps: tcp:localhost:10001
+    sender_canonical_classes: envelope_sender
+    recipient_canonical_maps: tcp:localhost:10002
+    recipient_canonical_classes: envelope_recipient,header_recipient
+    smtpd_client_restrictions: reject_unknown_client_hostname
+  notify: restart postfix
 
 - blockinfile:
     path: /etc/postfix/virtual
