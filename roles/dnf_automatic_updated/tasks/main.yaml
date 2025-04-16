@@ -1,0 +1,24 @@
+---
+- package:
+    name: dnf-automatic
+    state: present
+- replace:
+    path: /etc/dnf/automatic.conf
+    regexp: '^apply_updates =.*$'
+    replace: "apply_updates = yes"
+- replace:
+    path: /etc/dnf/automatic.conf
+    regexp: '^reboot =.*$'
+    replace: "reboot = when-needed"
+- replace:
+    path: /etc/dnf/automatic.conf
+    regexp: "^email_to =.*$"
+    replace: "email_to = mnk@mnk.dk"
+- replace:
+    path: /etc/dnf/automatic.conf
+    regexp: "^email_from =.*$"
+    replace: "email_from = mnk@mnk.dk"
+- service:
+    name: dnf-automatic.timer
+    enabled: yes
+    state: started

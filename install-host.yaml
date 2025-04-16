@@ -18,4 +18,5 @@
   gather_facts: false
   roles:
     - linode_host
+    - dnf_automatic_updated
     - postfix
