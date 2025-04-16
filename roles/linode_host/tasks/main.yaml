@@ -76,6 +76,12 @@
     immediate: yes
     state: enabled
 - firewalld:
+    zone: internal
+    permanent: yes
+    immediate: yes
+    port: "9090/tcp"
+    state: enabled
+- firewalld:
     zone: public
     permanent: yes
     immediate: yes
